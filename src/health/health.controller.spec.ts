@@ -1,18 +1,25 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HealthController } from './health.controller';
+import * as request from 'supertest';
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
+import { AppModule } from '../app.module';
 
 describe('HealthController', () => {
-  let controller: HealthController;
+  let app: INestApplication;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [HealthController],
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
     }).compile();
 
-    controller = module.get<HealthController>(HealthController);
+    app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe());
+    await app.init();
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  it('/health => should get an alive message', () => {
+    return request(app.getHttpServer())
+      .get('/health')
+      .expect(HttpStatus.OK)
+      .expect("I'm okay!");
   });
 });
