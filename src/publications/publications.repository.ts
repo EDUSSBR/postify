@@ -1,16 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
+import { CreatePublicationDto } from './dtos/publications.dtos';
 
 @Injectable()
 export class PublicationsRepository {
   constructor(private readonly prisma: PrismaService) {}
-  async createPublication({ title, username }) {
-    await this.prisma.publications.create({ data: { title, username } });
-  }
-  async getPublicationByUsernameAndTitle({ title, username }) {
-    return await this.prisma.publications.findFirst({
-      where: { title, username },
-    });
+  async createPublication({ mediaId, postId, date }) {
+    await this.prisma.publications.create({ data: { mediaId, postId, date } });
   }
   async getPublications() {
     return await this.prisma.publications.findMany();
@@ -18,10 +14,10 @@ export class PublicationsRepository {
   async getPublication(id: number) {
     return await this.prisma.publications.findUnique({ where: { id } });
   }
-  async updatePublication({ id, username, title }) {
+  async updatePublication({ id, mediaId, postId, date }: CreatePublicationDto) {
     await this.prisma.publications.update({
       where: { id },
-      data: { title, username },
+      data: { mediaId, postId, date },
     });
   }
   async deletePublication(id: number) {

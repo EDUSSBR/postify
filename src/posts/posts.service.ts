@@ -1,61 +1,57 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PostsRepository } from './posts.repository';
+import { CreatePostDto } from './dtos/posts.dtos';
 
 @Injectable()
 export class PostsService {
   constructor(private readonly postsRepository: PostsRepository) {}
-  async createPost({ title, username }) {
-    const PostExists = await this.postsRepository.getPostByUsernameAndTitle({
-      title,
-      username,
-    });
-    if (PostExists) {
-      throw new ConflictException();
-    }
+  //regra de negocio ok
+  async createPost({ title, text, image }: CreatePostDto) {
     await this.postsRepository.createPost({
       title,
-      username,
+      text,
+      image,
     });
   }
+  //regra de negocio ok
   async getPosts() {
-    return this.formatPost(await this.PostsRepository.getPosts());
+    return await this.postsRepository.getPosts();
   }
+  //regra de negocio ok
   async getPost(id: number) {
-    const Post = await this.PostsRepository.getPost(id);
-    if (Post) {
-      return this.formatPost(Post);
-    }
-    throw new NotFoundException();
-  }
-  async updatePost({ id, username, title }) {
-    const Post = await this.PostsRepository.getPost(id);
+    const Post = await this.postsRepository.getPost(id);
     if (!Post) {
       throw new NotFoundException();
     }
-    const PostExists = await this.PostsRepository.getPostByUsernameAndTitle({
-      username,
-      title,
-    });
-    if (PostExists) {
-      throw new ConflictException();
-    }
-    await this.PostsRepository.updatePost({ id, username, title });
+    return Post;
   }
+  //regra de negocio ok
+  async updatePost({ id, title, text, image }: CreatePostDto) {
+    const Post = await this.postsRepository.getPost(id);
+    if (!Post) {
+      throw new NotFoundException();
+    }
+    await this.postsRepository.updatePost({ id, title, text, image });
+  }
+  //deixar por ultimo semi ok a regra de negocio
+  //falta ver se tem publicação agendada
   async deletePost(id: number) {
-    const Post = await this.PostsRepository.getPost(id);
+    const Post = await this.postsRepository.getPost(id);
     if (!Post) {
       throw new NotFoundException();
     }
     //PUBLICATIONS RULES HERE TODO
-    await this.PostsRepository.deletePost(id);
+    await this.postsRepository.deletePost(id);
   }
-  formatPost(Post) {
-    if (Array.isArray(Post)) {
-      return Post.map((item) => ({
+  formatPost(posts) {
+    if (Array.isArray(posts)) {
+      return posts.map((item) => ({
         id: item.id,
         title: item.title,
-        username: item.username,
+        text: item.text,
+        image: item.image,
       }));
     }
-    return [{ id: Post.id, title: Post.title, username: Post.username }];
+    return [{ id: posts.id, title: posts.title, username: posts.username }];
   }
 }

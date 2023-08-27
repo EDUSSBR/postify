@@ -1,62 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { PublicationsRepository } from './publications.repository';
+import { MediasRepository } from 'src/medias/medias.repository';
+import { PostsRepository } from 'src/posts/posts.repository';
 
 @Injectable()
 export class PublicationsService {
   constructor(
     private readonly publicationsRepository: PublicationsRepository,
+    private readonly mediasRepository: MediasRepository,
+    private readonly postsRepository: PostsRepository,
   ) {}
-  async createPublications({ title, username }) {
-    const PublicationsExists =
-      await this.publicationsRepository.getPublicationsByUsernameAndTitle({
-        title,
-        username,
-      });
-    if (PublicationsExists) {
-      throw new ConflictException();
+  async createPublications({ mediaId, postId, date }) {
+    const [mediaExists, postExists] = await Promise.all([
+      this.mediasRepository.getMedia(mediaId),
+      this.postsRepository.getPost(postId),
+    ]);
+    if (!mediaExists || !postExists) {
+      throw new NotFoundException();
     }
-    await this.publicationsRepository.createPublications({
-      title,
-      username,
+    await this.publicationsRepository.createPublication({
+      mediaId,
+      postId,
+      date,
     });
   }
   async getPublications() {
-    return this.formatPublications(
-      await this.publicationsRepository.getPublications(),
-    );
+    return await this.publicationsRepository.getPublications();
   }
   async getPublication(id: number) {
-    const Publications = await this.publicationsRepository.getPublications(id);
-    if (Publications) {
-      return this.formatPublications(Publications);
+    const Publications = await this.publicationsRepository.getPublication(id);
+    if (!Publications) {
+      throw new NotFoundException();
     }
-    throw new NotFoundException();
+    return Publications;
   }
-  async updatePublication({ id, username, title }) {
-    const Publications = await this.publicationsRepository.getPublications(id);
+  async updatePublication({ id, mediaId, postId, date }) {
+    const Publications = await this.publicationsRepository.getPublication(id);
     if (!Publications) {
       throw new NotFoundException();
     }
     const PublicationsExists =
-      await this.publicationsRepository.getPublicationsByUsernameAndTitle({
-        username,
-        title,
-      });
+      await this.publicationsRepository.getPublication(id);
     if (PublicationsExists) {
       throw new ConflictException();
     }
-    await this.publicationsRepository.updatePublications({
+    await this.publicationsRepository.updatePublication({
       id,
-      username,
-      title,
+      mediaId,
+      postId,
+      date,
     });
   }
   async deletePublication(id: number) {
-    const Publications = await this.publicationsRepository.getPublications(id);
+    const Publications = await this.publicationsRepository.getPublication(id);
     if (!Publications) {
       throw new NotFoundException();
     }
     //PUBLICATIONS RULES HERE TODO
-    await this.publicationsRepository.deletePublications(id);
+    await this.publicationsRepository.deletePublication(id);
   }
   formatPublications(Publications) {
     if (Array.isArray(Publications)) {

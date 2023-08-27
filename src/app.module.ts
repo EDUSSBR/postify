@@ -13,6 +13,8 @@ import { PostsService } from './posts/posts.service';
 import { PublicationsService } from './publications/publications.service';
 import { MediasService } from './medias/medias.service';
 import { MediasRepository } from './medias/medias.repository';
+import { PostsRepository } from './posts/posts.repository';
+import { PublicationsRepository } from './publications/publications.repository';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { MediasRepository } from './medias/medias.repository';
     PublicationsService,
     MediasService,
     MediasRepository,
+    PostsRepository,
+    PublicationsRepository,
   ],
 })
 export class AppModule {}

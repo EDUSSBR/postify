@@ -23,12 +23,12 @@ export class MediasService {
     });
   }
   async getMedias() {
-    return this.formatMedia(await this.mediasRepository.getMedias());
+    return await this.mediasRepository.getMedias();
   }
   async getMedia(id: number) {
     const media = await this.mediasRepository.getMedia(id);
     if (media) {
-      return this.formatMedia(media);
+      return media;
     }
     throw new NotFoundException();
   }
