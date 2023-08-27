@@ -1,10 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PostsRepository } from './posts.repository';
 import { CreatePostDto } from './dtos/posts.dtos';
+import { PublicationsRepository } from '../publications/publications.repository';
 
 @Injectable()
 export class PostsService {
-  constructor(private readonly postsRepository: PostsRepository) {}
+  constructor(
+    private readonly postsRepository: PostsRepository,
+    private readonly publicationsRepository: PublicationsRepository,
+  ) {}
   //regra de negocio ok
   async createPost({ title, text, image }: CreatePostDto) {
     await this.postsRepository.createPost({
@@ -41,17 +49,11 @@ export class PostsService {
       throw new NotFoundException();
     }
     //PUBLICATIONS RULES HERE TODO
-    await this.postsRepository.deletePost(id);
-  }
-  formatPost(posts) {
-    if (Array.isArray(posts)) {
-      return posts.map((item) => ({
-        id: item.id,
-        title: item.title,
-        text: item.text,
-        image: item.image,
-      }));
+    const existsPublicationsWithThisPost =
+      await this.publicationsRepository.getPublicationByPostId(id);
+    if (existsPublicationsWithThisPost) {
+      throw new ForbiddenException();
     }
-    return [{ id: posts.id, title: posts.title, username: posts.username }];
+    await this.postsRepository.deletePost(id);
   }
 }
