@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PublicationsRepository } from './publications.repository';
-import { MediasRepository } from 'src/medias/medias.repository';
-import { PostsRepository } from 'src/posts/posts.repository';
+import { MediasRepository } from '../../src/medias/medias.repository';
+import { PostsRepository } from '../../src/posts/posts.repository';
 
 @Injectable()
 export class PublicationsService {
