@@ -3,7 +3,6 @@ CREATE TABLE "medias" (
     "id" SERIAL NOT NULL,
     "title" VARCHAR(150) NOT NULL,
     "username" VARCHAR(100) NOT NULL,
-    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "medias_pkey" PRIMARY KEY ("id")
 );
@@ -14,7 +13,6 @@ CREATE TABLE "posts" (
     "title" VARCHAR NOT NULL,
     "text" VARCHAR NOT NULL,
     "image" VARCHAR,
-    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "posts_pkey" PRIMARY KEY ("id")
 );
@@ -24,7 +22,7 @@ CREATE TABLE "publications" (
     "id" SERIAL NOT NULL,
     "mediaId" INTEGER,
     "postId" INTEGER,
-    "createdAt" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "date" TIMESTAMP(6),
 
     CONSTRAINT "publications_pkey" PRIMARY KEY ("id")
 );

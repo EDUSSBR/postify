@@ -11,7 +11,6 @@ model medias {
   id           Int            @id @default(autoincrement())
   title        String         @db.VarChar(150)
   username     String         @db.VarChar(100)
-  createdAt    DateTime?      @default(now()) @db.Timestamp(6)
   publications publications[]
 }
 
@@ -20,15 +19,14 @@ model posts {
   title        String         @db.VarChar
   text         String         @db.VarChar
   image        String?        @db.VarChar
-  createdAt    DateTime?      @default(now()) @db.Timestamp(6)
   publications publications[]
 }
 
 model publications {
-  id        Int       @id @default(autoincrement())
-  mediaId   Int?
-  postId    Int?
-  createdAt DateTime? @default(now()) @db.Timestamp(6)
-  medias    medias?   @relation(fields: [mediaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  posts     posts?    @relation(fields: [postId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id      Int       @id @default(autoincrement())
+  mediaId Int?
+  postId  Int?
+  date    DateTime? @db.Timestamp(6)
+  medias  medias?   @relation(fields: [mediaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  posts   posts?    @relation(fields: [postId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
