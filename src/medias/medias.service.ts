@@ -1,13 +1,18 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { MediasRepository } from './medias.repository';
+import { PublicationsRepository } from '../publications/publications.repository';
 
 @Injectable()
 export class MediasService {
-  constructor(private readonly mediasRepository: MediasRepository) {}
+  constructor(
+    private readonly mediasRepository: MediasRepository,
+    private readonly publicationsRepository: PublicationsRepository,
+  ) {}
 
   async createMedia({ title, username }) {
     const mediaExists = await this.mediasRepository.getMediaByUsernameAndTitle({
@@ -52,16 +57,11 @@ export class MediasService {
       throw new NotFoundException();
     }
     //PUBLICATIONS RULES HERE TODO
-    await this.mediasRepository.deleteMedia(id);
-  }
-  formatMedia(media) {
-    if (Array.isArray(media)) {
-      return media.map((item) => ({
-        id: item.id,
-        title: item.title,
-        username: item.username,
-      }));
+    const existsPublicationsWithThisMedia =
+      await this.publicationsRepository.getPublicationByMediaId(id);
+    if (existsPublicationsWithThisMedia) {
+      throw new ForbiddenException();
     }
-    return [{ id: media.id, title: media.title, username: media.username }];
+    await this.mediasRepository.deleteMedia(id);
   }
 }

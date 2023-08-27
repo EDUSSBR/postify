@@ -14,6 +14,12 @@ export class PublicationsRepository {
   async getPublication(id: number) {
     return await this.prisma.publications.findUnique({ where: { id } });
   }
+  async getPublicationByMediaId(mediaId: number) {
+    return await this.prisma.publications.findFirst({ where: { mediaId } });
+  }
+  async getPublicationByPostId(postId: number) {
+    return await this.prisma.publications.findFirst({ where: { postId } });
+  }
   async updatePublication({ id, mediaId, postId, date }: CreatePublicationDto) {
     await this.prisma.publications.update({
       where: { id },
