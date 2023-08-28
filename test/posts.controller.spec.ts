@@ -8,14 +8,15 @@ describe('PostsController', () => {
   let app: INestApplication;
   let prisma: PrismaService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
     prisma = await moduleFixture.resolve(PrismaService);
-
+  });
+  beforeEach(async () => {
     await prisma.publications.deleteMany();
     await prisma.medias.deleteMany();
     await prisma.posts.deleteMany();

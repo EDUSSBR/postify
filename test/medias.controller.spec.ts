@@ -7,15 +7,15 @@ import { faker } from '@faker-js/faker';
 describe('MediasController', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
     prisma = await moduleFixture.resolve(PrismaService);
-
+  });
+  beforeEach(async () => {
     await prisma.publications.deleteMany();
     await prisma.medias.deleteMany();
     await prisma.posts.deleteMany();
@@ -37,7 +37,6 @@ describe('MediasController', () => {
   it('POST /medias => Should not be possible to create a media if it already exists (same username/title)', async () => {
     const title = faker.company.name();
     const username = faker.person.middleName();
-    console.log(title, username);
     await request(app.getHttpServer()).post('/medias').send({
       title,
       username,
@@ -53,7 +52,6 @@ describe('MediasController', () => {
   it('POST /medias => Should not be possible to create a media if missing title or username', async () => {
     const title = faker.company.name();
     const username = faker.person.middleName();
-    console.log(title, username);
     await request(app.getHttpServer())
       .post('/medias')
       .send({
@@ -210,7 +208,6 @@ describe('MediasController', () => {
       `/medias`,
     );
     const { id } = createdMediaResponse.body[0];
-    console.log('mediaid', id);
     await request(app.getHttpServer())
       .delete(`/medias/${id}`)
       .send()
@@ -244,7 +241,6 @@ describe('MediasController', () => {
       `/posts`,
     );
     const { id: postId } = createdPostResponse.body[0];
-    console.log({ mediaId, postId, date });
     await request(app.getHttpServer())
       .post('/publications')
       .send({ mediaId, postId, date });
