@@ -36,7 +36,7 @@ export class PublicationsService {
     if (!Publications) {
       throw new NotFoundException();
     }
-    return Publications;
+    return [Publications];
   }
   async updatePublication({ id, mediaId, postId, date }) {
     const Publications = await this.publicationsRepository.getPublication(id);
