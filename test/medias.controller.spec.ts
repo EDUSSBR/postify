@@ -219,6 +219,7 @@ describe('MediasController', () => {
       app.getHttpServer(),
     ).get(`/medias`);
     expect(createdMediaAfterDeletingResponse.body).toHaveLength(0);
+    expect(createdMediaAfterDeletingResponse.body).toBeInstanceOf(Array);
   });
   it('DELETE /medias/:id => Should receive 404 if media does not exists', async () => {
     await request(app.getHttpServer()).delete(`/medias/10000`).expect(404);
