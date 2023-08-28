@@ -1,5 +1,5 @@
 import {
-  ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -43,11 +43,17 @@ export class PublicationsService {
     if (!Publications) {
       throw new NotFoundException();
     }
-    const PublicationsExists =
-      await this.publicationsRepository.getPublication(id);
-    if (PublicationsExists) {
-      throw new ConflictException();
+    if (new Date(Publications.date) < new Date()) {
+      throw new ForbiddenException();
     }
+    const [mediaExists, postExists] = await Promise.all([
+      this.mediasRepository.getMedia(mediaId),
+      this.postsRepository.getPost(postId),
+    ]);
+    if (!mediaExists || !postExists) {
+      throw new NotFoundException();
+    }
+
     await this.publicationsRepository.updatePublication({
       id,
       mediaId,
@@ -60,7 +66,6 @@ export class PublicationsService {
     if (!Publications) {
       throw new NotFoundException();
     }
-    //PUBLICATIONS RULES HERE TODO
     await this.publicationsRepository.deletePublication(id);
   }
   formatPublications(Publications) {
