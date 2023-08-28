@@ -23,15 +23,19 @@ export class PostsService {
   }
   //regra de negocio ok
   async getPosts() {
-    return await this.postsRepository.getPosts();
+    return (await this.postsRepository.getPosts()).map((post) =>
+      post.image ? post : { text: post.text, title: post.title, id: post.id },
+    );
   }
   //regra de negocio ok
   async getPost(id: number) {
-    const Post = await this.postsRepository.getPost(id);
-    if (!Post) {
+    const post = await this.postsRepository.getPost(id);
+    if (!post) {
       throw new NotFoundException();
     }
-    return Post;
+    return post.image
+      ? post
+      : { text: post.text, title: post.title, id: post.id };
   }
   //regra de negocio ok
   async updatePost({ id, title, text, image }: CreatePostDto) {
